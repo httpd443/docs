@@ -7,10 +7,9 @@ PureFTPdの設定は、起動時にコマンドラインオプションとして
 
 ## 記述について
 
-- コマンド名はコンパイル時のデフォルト名である「pure-ftpd」とする。コマンド実行時にPATHが通っているかどうかについては考慮していない
-- コマンド実行時のオプションは実際には多数のオプションが並ぶことになるが、ここでは見やすさのために説明対象のオプションのみを記すことにする
-- コマンド実行時にroot権限が必要かどうかに関係なく、コマンドプロンプトは「$」で統一する
-- 便宜上の簡潔さのため、pure-ftpd.confの記述内容とコマンド実行との併記については、CUI上の厳密さは無視することにした。
+- コマンド実行時のオプションは、見やすさのために説明対象のオプションのみを記すことにする
+- コマンドプロンプトは「$」で統一する。root権限が必要かどうかは考慮していない
+- 便宜上の簡潔さのため、pure-ftpd.confの記述内容とコマンド実行との併記については、CUI上の厳密さは無視している
 
 ## 使い方に関する項目
 
@@ -185,289 +184,689 @@ $ pure-ftpd -Y 1
 $ pure-ftpd -Y 2
 ```
 
+## ファイルアクセス
 
-<div id="file">
- <h3>ファイルアクセス</h3>
- <dl>
-  <dt id="TrustedGID">-a <var>gid</var></dt>
-  <dd class="longopt">LongOption: --trustedgid <var>gid</var></dd>
-  <dd class="conffile">pure-ftpd.conf: TrustedGID <var>gid</var></dd>
-  <dd>rootと<var>gid</var>に指定したグループに所属するユーザ以外のユーザをchrootする。</dd>
-  <dt id="ChrootEveryone">-A</dt>
-  <dd class="longopt">LongOption: --chrooteveryone</dd>
-  <dd class="conffile">pure-ftpd.conf: ChrootEveryone</dd>
-  <dd>root以外の全ユーザをchrootする。</dd>
-  <dt id="NoRename">-G</dt>
-  <dd class="longopt">LongOption: --norename</dd>
-  <dd class="conffile">pure-ftpd.conf: NoRename</dd>
-  <dd>ファイルの移動、ファイル名変更を禁止する。</dd>
-  <dt id="NoChmod">-R</dt>
-  <dd class="longopt">LongOption: --nochmod</dd>
-  <dd class="conffile">pure-ftpd.conf: NoChmod</dd>
-  <dd>root以外のユーザによるchmodコマンドの使用を禁止する。</dd>
-  <dt id="Umask">-U <var>umask file:umask dir</var></dt>
-  <dd class="longopt">LongOption: --umask <var>umask file:umask dir</var></dd>
-  <dd class="conffile">pure-ftpd.conf: Umask <var>umask file:umask dir</var></dd>
-  <dd>ファイルとディレクトリ作成時のumaskを指定する。デフォルトは133と022。</dd>
-  <dd class="sample">使用例：<dl>
-   <dt>-U 177:077</dt>
-   <dd>ファイルのumaskを177、ディレクトリのumaskを077にする</dd>
-  </dl></dd>
-  <dt id="ProhibitDotFilesWrite">-x</dt>
-  <dd class="longopt">LongOption: --prohibitdotfileswrite</dd>
-  <dd class="conffile">pure-ftpd.conf: ProhibitDotFilesWrite</dd>
-  <dd>ドットファイルへの一般ユーザの上書きと作成、削除を禁止する。anonymousユーザの場合は、セキュリティ上の理由(.rhostsや.sshなど)でドットファイルへのアクセスはデフォルトで禁止されている。</dd>
-  <dt id="ProhibitDotFilesRead">-X</dt>
-  <dd class="longopt">LongOption: --prohibitdotfilesread</dd>
-  <dd class="conffile">pure-ftpd.conf: ProhibitDotFilesRead</dd>
-  <dd>上記の-xオプションの機能に加えて、ドットファイルを読むことも禁止する。~/.sshのようなドットで始まるディレクトリの場合はcdすることができなくなる。</dd>
- </dl>
-</div>
+### 特定グループ以外のユーザーをchroot
 
-<div id="compat">
- <h3>利便性</h3>
- <dl>
-  <dt id="NoTruncate">-0</dt>
-  <dd class="longopt">LongOption: --notruncate</dd>
-  <dd class="conffile">pure-ftpd.conf: NoTruncate</dd>
-  <dd>アップロードするファイルが既に存在するときに、そのまま上書きせずにアップロードが終わってから入れ替える。このオプションはvirtual quotaと互換性がない。</dd>
-  <dt id="BrokenClientsCompatibility">-b</dt>
-  <dd class="longopt">LongOption: --brokenclientscompatibility</dd>
-  <dd class="conffile">pure-ftpd.conf: BrokenClientsCompatibility</dd>
-  <dd>RFCに準拠しないFTPクライアントソフトとの互換性を優先する。FFFTPのデフォルトの設定のNLSTの問題をサーバ側での解決にも有効</dd>
-  <dt id="DisplayDotFiles">-D</dt>
-  <dd class="longopt">LongOption: --displaydotfiles</dd>
-  <dd class="conffile">pure-ftpd.conf: DisplayDotFiles</dd>
-  <dd>クライアント側が-aオプションをつけなくてもファイル一覧表示時にデフォルトでドットファイルを表示する</dd>
-  <dt id="CreateHomeDir">-j</dt>
-  <dd class="longopt">LongOption: --createhomedir</dd>
-  <dd class="conffile">pure-ftpd.conf: CreateHomeDir</dd>
-  <dd>ユーザログイン時にホームディレクトリが存在しない場合に自動的に作成する</dd>
-  <dt id="CustomerProof">-Z</dt>
-  <dd class="longopt">LongOption: --customerproof</dd>
-  <dd class="conffile">pure-ftpd.conf: CustomerProof</dd>
-  <dd>ユーザが起こしがちな過ちを防ぐ。今のところ、ユーザがchmodで自らのファイルやディレクトリにアクセスできなくなるのを防止する。</dd>
- </dl>
-</div>
+rootとgidに指定したグループに所属するユーザ以外のユーザをchrootする
 
-<div id="resouce">
- <h3>負荷の制御など</h3>
- <dl>
-  <dt id="MaxIdleTime">-I <var>time</var></dt>
-  <dd class="longopt">LongOption: --maxidletime <var>time</var></dd>
-  <dd class="conffile">pure-ftpd.conf: MaxIdleTime <var>time</var></dd>
-  <dd>タイムアウトまでの無通信時間の最大値を分単位で設定。デフォルトでは15分</dd>
-  <dt id="MaxDiskUsage">-k <var>percentage</var></dt>
-  <dd class="longopt">LongOption: --maxdiskusagepct <var>percentage</var></dd>
-  <dd class="conffile">pure-ftpd.conf: MaxDiskUsage <var>percentage</var></dd>
-  <dd>ディスクの使用量が指定したパーセンテージを超えた場合に、それ以上のアップロードを禁止する。</dd>
-  <dd class="sample">使用例：<dl>
-   <dt>-k 95</dt>
-   <dd>ディスク使用量が95%を超えるとそれ以上のアップロードを禁止する</dd>
-  </dl></dd>
-  <dt id="LimitRecursion">-L <var>max files:max depth</var></dt>
-  <dd class="longopt">LongOption: --limitrecursion <var>max files:max depth</var></dd>
-  <dd class="conffile">pure-ftpd.conf: LimitRecursion <var>max files:max depth</var></dd>
-  <dd>ファイル一覧に表示するファイルの数と(-Rオプションによる再帰的表示時の)サブディレクトリの深度の上限を設定する。デフォルトでは2000:5。</dd>
-  <dt id="Quota">-n <var>max files:max size</var></dt>
-  <dd class="longopt">LongOption: --quota <var>max files:max size</var></dd>
-  <dd class="conffile">pure-ftpd.conf: Quota <var>max files:max size</var></dd>
-  <dd>virtual quotasを使用する。.ftpqutoaファイルが作成され、ユーザごとにホームディレクトリ内のファイル数の最大値と容量の最大値を制限する。</dd>
- </dl>
-</div>
+    # short option
+    $ pure-ftpd -a <gid>
 
-<div id="concurrency">
- <h3>同時アクセス制限</h3>
- <dl>
-  <dt id="MaxClientsNumber">-c <var>clients</var></dt>
-  <dd class="longopt">LongOption: --maxclientsnumber <var>clients</var></dd>
-  <dd class="conffile">pure-ftpd.conf: MaxClientsNumber <var>clients</var></dd>
-  <dd> FTPクライアントの同時接続数の上限をclientsに設定。デフォルトでは50。-pオプション使用時は、その範囲のポートの数の半分以下にすること。</dd>
-  <dt id="MaxClientsPerIP">-C <var>clients</var></dt>
-  <dd class="longopt">LongOption: --maxclientsperip  <var>clients</var></dd>
-  <dd class="conffile">pure-ftpd.conf: MaxClientsPerIP <var>clients</var></dd>
-  <dd> 接続元IPアドレスあたりの同時接続数を指定する。</dd>
-  <dt id="PerUserLimits">-y <var>user:anon</var></dt>
-  <dd class="longopt">LongOption: --peruserlimits <var>user:anon</var></dd>
-  <dd class="conffile">pure-ftpd.conf: PerUserLimits <var>user:anon</var></dd>
-  <dd>ユーザあたりの同時最大接続数、anonymousユーザの最大接続数を指定する。</dd>
-  <dd class="sample">使用例：<dl>
-   <dt>-y <var>3:20</var> -c <var>15</var> -C <var>5</var></dt>
-   <dd>全体の上限が15セッション<br />同一IPからのアクセスの上限が5<br />同じユーザアカウントからのアクセスの上限が3<br />anonymous接続の上限は20。</dd>
- </dl>
-</div>
+    # long option
+    $ pure-ftpd --trustedgid <gid>
 
-<div id="bandwidth">
- <h3>帯域制御</h3>
- <dl>
-  <dt id="AnonymousBandwidth">-t <var>bandwidth or [up]:[down]</var></dt>
-  <dd class="longopt">LongOption: --anonymousbandwidth <var>bandwidth or [up]:[down]</var></dd>
-  <dd class="conffile">pure-ftpd.conf: AnonymousBandwidth <var>bandwidth or [up]:[down]</var></dd>
-  <dd>anonymousユーザの帯域幅をKB/s単位で制限する。</dd>
-  <dt id="UserBandwidth">-T <var>bandwidth or [up]:[down]</var></dt>
-  <dd class="longopt">LongOption: --userbandwidth <var>bandwidth or [up]:[down]</var></dd>
-  <dd class="conffile">pure-ftpd.conf: UserBandwidth <var>bandwidth or [up]:[down]</var></dd>
-  <dd>全てのユーザの帯域幅をKB/s単位で制限する。</dd>
- </dl>
-</div>
+    # pure-ftpd.conf
+    TrustedGID        <gid>
 
-<div id="log">
- <h3>ログ</h3>
- <dl>
-  <dt id="LogPID">-1</dt>
-  <dd class="longopt">LongOption: --logpid</dd>
-  <dd class="conffile">pure-ftpd.conf: LogPID</dd>
-  <dd>PIDをSyslogへの出力に加える。-f <var>none</var>が指定された場合にはこのオプションは無視される</dd>
-  <dt id="VerboseLog">-d</dt>
-  <dd class="longopt">LongOption: --verboselog</dd>
-  <dd class="conffile">pure-ftpd.conf: VerboseLog</dd>
-  <dd>FTPクライアント側の全コマンドをSyslogに出力する。-d -dのように二重に指定するとサーバ側の応答も出力する。</dd>
-  <dt id="SyslogFacility">-f <var>facility</var></dt>
-  <dd class="longopt">LongOption: --syslogfacility <var>facility</var></dd>
-  <dd class="conffile">pure-ftpd.conf: SyslogFacility <var>facility</var></dd>
-  <dd>Syslogへ出力する際のfacilityを指定する。デフォルトではftp( or local2 )。noneを指定するとSyslogへの出力を行わない</dd>
-  <dt id="DontResolve">-H</dt>
-  <dd class="longopt">LongOption: --dontresolve</dd>
-  <dd class="conffile">pure-ftpd.conf: DontResolve</dd>
-  <dd>FTPクライアントの名前解決を行わないのでDNSアクセスの手間を省略できる。Syslogへの出力ではFTPクライアントのホスト名ではなくIPアドレスを出力する。</dd>
-  <dt id="AltLog">-O <var>format:file</var></dt>
-  <dd class="longopt">LongOption: --altlog <var>format:file</var></dd>
-  <dd class="conffile">pure-ftpd.conf: AltLog <var>format:file</var></dd>
-  <dd>転送ログを指定したファイルに指定したフォーマットで出力する。</dd>
-  <dd class="sample">使用例：<dl>
-   <dt>-O <var>clf:/var/log/pureftpd.log</var></dt>
-   <dd>Apache likeな転送ログを出力する</dd>
-   <dt>-O <var>stats:/var/log/pureftpd.log</var></dt>
-   <dd>独自形式の転送ログを出力する</dd>
-   <dt>-O <var>w3c:/var/log/pureftpd.log</var></dt>
-   <dd>IIS likeな転送ログを出力する</dd>
-   <dt>-O <var>xferlog:/var/log/pureftpd.log</var></dt>
-   <dd>昔ながらのxferlog形式で転送ログを出力する</dd>
-  </dl></dd>
- </dl>
-</div>
+### root以外をchroot
 
-<div id="anonymous">
- <h3>AnonymousFTP</h3>
- <dl>
-  <dt id="AnonymousOnly">-e</dt>
-  <dd class="longopt">LongOption: --anonymousonly</dd>
-  <dd class="conffile">pure-ftpd.conf: AnonymousOnly</dd>
-  <dd>Anonymous専用FTPサーバにする。anonymous以外のユーザはログインできない</dd>
-  <dt id="AnonymousCantUpload">-i</dt>
-  <dd class="longopt">LongOption: --anonymouscantupload</dd>
-  <dd class="conffile">pure-ftpd.conf: AnonymousCantUpload</dd>
-  <dd>パーミッションに関わらずanonymousユーザのアップロードを禁止する</dd>
-  <dt id="MaxLoad">-m <var>load</var></dt>
-  <dd class="longopt">LongOption: --maxload <var>load</var></dd>
-  <dd class="conffile">pure-ftpd.conf: MaxLoad <var>load</var></dd>
-  <dd>ロードアベレージが<var>load</var>を超えるときにanonymousユーザのダウンロードを禁止する。ファイル一覧表示とアップロードは可能</dd>
-  <dt id="AnonymousCanCreateDirs">-M</dt>
-  <dd class="longopt">LongOption: --anonymouscancreatedirs</dd>
-  <dd class="conffile">pure-ftpd.conf: AnonymousCanCreateDirs</dd>
-  <dd>anonymousユーザのディレクトリ作成を許可する</dd>
-  <dt id="AntiWarez">-s</dt>
-  <dd class="longopt">LongOption: --antiwarez</dd>
-  <dd class="conffile">pure-ftpd.conf: AntiWarez</dd>
-  <dd>anonymousユーザが「ftp」ユーザ所有のファイルのダウンロードを禁止する。warezサイト化防止のためのオプション。</dd>
-  <dt id="TrustedIP">-V <var>ip</var></dt>
-  <dd class="longopt">LongOption: --trustedip <var>ip</var></dd>
-  <dd class="conffile">pure-ftpd.conf: TrustedIP <var>ip</var></dd>
-  <dd>管理用のIPアドレスを指定。このIPアドレスへアクセスしてきた場合は一般ユーザのみログインでき、他のIPアドレス以外へアクセスしてきた場合はanonymousユーザのみログインできる。</dd>
-  <dt id="AllowDotFiles">-z</dt>
-  <dd class="longopt">LongOption: --allowdotfiles</dd>
-  <dd class="conffile">pure-ftpd.conf: AllowDotFiles</dd>
-  <dd> anonymousユーザに対して、ドットで始まる名前のファイルとディレクトリへのreadアクセスを許可する。</dd>
- </dl>
-</div>
+root以外の全ユーザをchrootする
 
-<div id="nat">
- <h3>NAT,パケットフィルタ</h3>
- <dl>
-  <dt id="NATmode">-N</dt>
-  <dd class="longopt">LongOption: --natmode</dd>
-  <dd class="conffile">pure-ftpd.conf: NATmode</dd>
-  <dd>passiveモードを禁止する</dd>
-  <dt id="PassivePortRange">-p <var>min port:max port</var></dt>
-  <dd class="longopt">LongOption: --passiveportrange <var>min port:max port</var></dd>
-  <dd class="conffile">pure-ftpd.conf: PassivePortRange <var>min port:max port</var></dd>
-  <dd>passiveモードで使用するポートの範囲を指定する</dd>
-  <dd class="sample">使用例：<dl>
-   <dt>-p 4000:5000</dt>
-   <dd>使用するポートの範囲を4000〜5000にする</dd>
-  </dl></dd>
-  <dt id="ForcePassiveIP">-P <var>IP or Host</var></dt>
-  <dd class="longopt">LongOption: --forcepassiveip  <var>IP or Host</var></dd>
-  <dd class="conffile">pure-ftpd.conf: ForcePassiveIP <var>IP or Host</var></dd>
-  <dd>PASV/EPSV/SPSVコマンド(要するにpassiveモード)への応答に使うIPアドレスを指定する。DDNS利用時はホスト名を指定する。</dd>
- </dl>
-</div>
+    # short option
+    $ pure-ftpd -A
 
-<div id="ratio">
- <h3>Ratio</h3>
- <dl>
-  <dt id="AnonymousRatio">-q <var>upload:download</var></dt>
-  <dd class="longopt">LongOption: --anonymousratio <var>upload:download</var></dd>
-  <dd class="conffile">pure-ftpd.conf: AnonymousRatio <var>upload:download</var></dd>
-  <dd>anonymousユーザのratio比率を設定する。-q 1:5なら1MBのファイルを献上する見返りに5MBのファイルを入手できる。</dd>
-  <dt id="UserRatio">-Q <var>upload:download</var></dt>
-  <dd class="longopt">LongOption: --userratio <var>upload:download</var></dd>
-  <dd class="conffile">pure-ftpd.conf: UserRatio <var>upload:download</var></dd>
-  <dd>anonymousユーザ、一般ユーザの両方に対してratio比率を設定する。-aオプション使用時には該当のグループに属するユーザはこの制限は適用されない。</dd>
- </dl>
-</div>
+    # long option
+    $ pure-ftpd --chrooteveryone
 
-<div id="fxp">
- <h3>FXP</h3>
- <dl>
-  <dt id="AllowUserFXP">-w</dt>
-  <dd class="longopt">LongOption: --allowuserfxp</dd>
-  <dd class="conffile">pure-ftpd.conf: AllowUserFXP</dd>
-  <dd>一般ユーザのFXPの使用を許可する</dd>
-  <dt id="AllowAnonymousFXP">-W</dt>
-  <dd class="longopt">LongOption: --allowanonymousfxp</dd>
-  <dd class="conffile">pure-ftpd.conf: AllowAnonymousFXP</dd>
-  <dd>一般ユーザ以外にanonymousユーザにもFXPの使用を許可する</dd>
- </dl>
-</div>
+    # pure-ftpd.conf
+    ChrootEveryone
 
-<div id="japanese">
- <h3>日本語</h3>
- <dl>
-  <dt id="FileSystemCharset">-8</dt>
-  <dd class="longopt">LongOption: --fscharset <var>charset</var></dd>
-  <dd class="conffile">pure-ftpd.conf: FileSystemCharset <var>charset</var></dd>
-  <dd>サーバ側のファイル名の文字コードを指定する。</dd>
-  <dd>iconvを利用しているので、<var>charset</var>の値は、EUC-JP CP932 ISO-2022-JP SJIS UTF-8 UTF-8-MAC等・・・</dd>
-  <dt id="ClientCharset">-9</dt>
-  <dd class="longopt">LongOption: --clientcharset <var>charset</var></dd>
-  <dd class="conffile">pure-ftpd.conf: ClientCharset <var>charset</var></dd>
-  <dd>クライアント側のファイル名のデフォルトの文字コードを指定する</dd>
- </dl>
-</div>
+### ファイルの移動、ファイル名変更の禁止
 
-<div id="misc">
- <h3>その他</h3>
- <dl>
-  <dt id="FortunesFile">-F <var>file</var></dt>
-  <dd class="longopt">LongOption: --fortunesfile <var>file</var></dd>
-  <dd class="conffile">pure-ftpd.conf: FortunesFile <var>file</var></dd>
-  <dd>ログイン時に<var>file</var>からランダムに選ばれたメッセージを表示する。</dd>
-  <dt id="KeepAllFiles">-K</dt>
-  <dd class="longopt">LongOption: --keepallfiles</dd>
-  <dd class="conffile">pure-ftpd.conf: KeepAllFiles</dd>
-  <dd>ファイルの消失防止のためのオプション。ファイルの名前変更と削除を禁止し、ファイルのアップロードとアップロードのresumeは許可される。上書きについてはアップロード時のresumeのために許可されるので、-rオプションと組み合わせて使うとよい。</dd>
-  <dt id="CallUploadScript">-o</dt>
-  <dd class="longopt">LongOption: --uploadscript</dd>
-  <dd class="conffile">pure-ftpd.conf: CallUploadScript</dd>
-  <dd>pure-uploadscriptを使う。</dd>
-  <dt id="AutoRename">-r</dt>
-  <dd class="longopt">LongOption: --autorename</dd>
-  <dd class="conffile">pure-ftpd.conf: AutoRename</dd>
-  <dd>ファイルのアップロード時に、すでに同名のファイルが同じディレクトリに存在する時に上書きせずにxyz.1、xyz.2などとする。</dd>
-  <dt id="Bonjour">-v <var>name</var></dt>
-  <dd class="longopt">LongOption: --bonjour <var>name</var></dd>
-  <dd class="conffile">pure-ftpd.conf: なし</dd>
-  <dd>Bonjour名を<var>name</var>に設定する。</dd>
- </dl>
-</div>
+ファイルの移動、ファイル名変更を禁止する
+
+    # short option
+    $ pure-ftpd -G
+
+    # long option
+    $ pure-ftpd --norename
+
+    # pure-ftpd.conf
+    NoRename
+
+### chmod制限
+
+root以外のユーザによるchmodコマンドの使用を禁止する
+
+    # short option
+    $ pure-ftpd -R
+
+    # long option
+    $ pure-ftpd --nochmod
+
+    # pure-ftpd.conf
+    NoChmod
+
+### umask
+
+ファイルとディレクトリ作成時のumaskを指定する。デフォルトは133と022
+
+    # short option
+    $ pure-ftpd -U <umask file:umask dir>
+
+    # long option
+    $ pure-ftpd --umask <umask file:umask dir>
+
+    # pure-ftpd.conf
+    Umask        <umask file:umask dir>
+
+例
+```
+# ファイルのumaskを177、ディレクトリのumaskを077にする
+$ pure-ftpd -U 177:077
+```
+
+### ドットファイルの変更禁止
+
+ドットファイルへの一般ユーザの上書きと作成、削除を禁止する。anonymousユーザの場合は、セキュリティ上の理由(.rhostsや.sshなど)でドットファイルへのアクセスはデフォルトで禁止されている
+
+    # short option
+    $ pure-ftpd -x
+
+    # long option
+    $ pure-ftpd --prohibitdotfileswrite
+
+    # pure-ftpd.conf
+    ProhibitDotFilesWrite
+
+### ドットファイルのread禁止
+
+前項の-xオプションの機能に加えて、ドットファイルを読むことも禁止する。~/.sshのようなドットで始まるディレクトリの場合はcdすることができなくなる
+
+    # short option
+    $ pure-ftpd -X
+
+    # long option
+    $ pure-ftpd --prohibitdotfilesread
+
+    # pure-ftpd.conf
+    ProhibitDotFilesRead
+
+## 利便性
+
+### アトミックなアップロード
+
+アップロードするファイルが既に存在するときに、そのまま上書きせずにアップロードが終わってから入れ替える。このオプションはvirtual quotaと互換性がない
+
+
+    # short option
+    $ pure-ftpd -0
+
+    # long option
+    $ pure-ftpd --notruncate
+
+    # pure-ftpd.conf
+    NoTruncate
+
+### FTPクライアントとの互換性
+
+RFCに準拠しないFTPクライアントソフトとの互換性を優先する<br>
+FFFTPのNLST問題をサーバ側での解決する場合などに有効
+
+    # short option
+    $ pure-ftpd -b
+
+    # long option
+    $ pure-ftpd --brokenclientscompatibility
+
+    # pure-ftpd.conf
+    BrokenClientsCompatibility
+
+### ドットファイルのファイル一覧表示
+
+クライアント側が-aオプションをつけなくてもファイル一覧表示時にデフォルトでドットファイルを表示する
+
+    # short option
+    $ pure-ftpd -D
+
+    # long option
+    $ pure-ftpd --displaydotfiles
+
+    # pure-ftpd.conf
+    DisplayDotFiles
+
+### ホームディレクトリ自動作成
+
+ユーザログイン時にホームディレクトリが存在しない場合に自動的に作成する
+
+    # short option
+    $ pure-ftpd -j
+
+    # long option
+    $ pure-ftpd --createhomedir
+
+    # pure-ftpd.conf
+    CreateHomeDir
+
+### 操作ミス防止
+
+ユーザが起こしがちな過ちを防ぐ。今のところ、ユーザがchmodで自らのファイルやディレクトリにアクセスできなくなるのを防止する
+
+    # short option
+    $ pure-ftpd -Z
+
+    # long option
+    $ pure-ftpd --customerproof
+
+    # pure-ftpd.conf
+    CustomerProof
+
+## 負荷の制御など
+
+### タイムアウト
+
+タイムアウトまでの無通信時間の最大値を分単位で設定。デフォルトでは15分
+
+    # short option
+    $ pure-ftpd -I <time>
+
+    # long option
+    $ pure-ftpd --maxidletime <time>
+
+    # pure-ftpd.conf
+    MaxIdleTime        <time>
+
+### アップロード抑制
+
+ディスクの使用量が指定したパーセンテージを超えた場合に、それ以上のアップロードを禁止する
+
+    # short option
+    $ pure-ftpd -k <percentage>
+
+    # long option
+    $ pure-ftpd --maxdiskusagepct <percentage>
+
+    # pure-ftpd.conf
+    MaxDiskUsage        <percentage>
+
+例
+```
+# ディスク使用量が95%を超えるとそれ以上のアップロードを禁止する
+$ pure-ftpd -k 95
+```
+
+### ファイル一覧表示の数の抑制
+
+ファイル一覧に表示するファイルの数と(-Rオプションによる再帰的表示時の)サブディレクトリの深度の上限を設定する。FTPクライアント側が特定ディレクトリ配下のファイル情報を再帰的に一気に取得するような仕様の場合は、この設定値を緩和する必要が生じる可能性がある。デフォルトでは2000:5
+
+    # short option
+    $ pure-ftpd -L <max files:max depth>
+
+    # long option
+    $ pure-ftpd --limitrecursion <max files:max depth>
+
+    # pure-ftpd.conf
+    LimitRecursion        <max files:max depth>
+
+### virtual quota
+
+virtual quotaを使用する。.ftpqutoaファイルが作成され、ユーザごとにホームディレクトリ内のファイル数の最大値と容量の最大値を制限する
+
+    # short option
+    $ pure-ftpd -n <max files:max size>
+
+    # long option
+    $ pure-ftpd --quota <max files:max size>
+
+    # pure-ftpd.conf
+    Quota        <max files:max size>
+
+## 同時アクセス制限
+
+### 同時接続FTPクライアント数の上限
+
+FTPクライアントの同時接続数の上限をclientsに設定。デフォルトでは50。-pオプション使用時は、その範囲のポートの数の半分以下にすること
+
+    # short option
+    $ pure-ftpd -c <clients>
+
+    # long option
+    $ pure-ftpd --maxclientsnumber <clients>
+
+    # pure-ftpd.conf
+    MaxClientsNumber        <clients>
+
+### 同時接続FTPクライアント数の上限
+
+接続元IPアドレスあたりの同時接続数を指定する
+
+    # short option
+    $ pure-ftpd -C <clients>
+
+    # long option
+    $ pure-ftpd --maxclientsperip <clients>
+
+    # pure-ftpd.conf
+    MaxClientsPerIP        <clients>
+
+### IPアドレスあたりの同時接続数
+
+接続元IPアドレスあたりの同時接続数を指定する
+
+    # short option
+    $ pure-ftpd -C <clients>
+
+    # long option
+    $ pure-ftpd --maxclientsperip <clients>
+
+    # pure-ftpd.conf
+    MaxClientsPerIP        <clients>
+
+### ユーザあたりの同時接続数
+
+ユーザあたりの同時最大接続数、anonymousユーザの最大接続数を指定する
+
+    # short option
+    $ pure-ftpd -y <user:anon>
+
+    # long option
+    $ pure-ftpd --peruserlimits <var>user:anon</var>
+
+    # pure-ftpd.conf
+    PerUserLimits        <var>user:anon</var>
+
+例
+```
+# 全体の上限が15セッション
+# 同一IPからのアクセスの上限が5
+# 同じユーザアカウントからのアクセスの上限が3
+# anonymous接続の上限は20
+$ pure-ftpd -y <3:20> -c <15> -C <5>
+```
+
+### 帯域制御（anonymous）
+
+anonymousユーザの帯域幅をKB/s単位で制限する
+
+    # short option
+    $ pure-ftpd -t <bandwidth or [up]:[down]>
+
+    # long option
+    $ pure-ftpd --anonymousbandwidth <bandwidth or [up]:[down]>
+
+    # pure-ftpd.conf
+    AnonymousBandwidth        <bandwidth or [up]:[down]>
+
+### 帯域制御（認証ユーザー）
+
+全てのユーザの帯域幅をKB/s単位で制限する
+
+    # short option
+    $ pure-ftpd -T <bandwidth or [up]:[down]>
+
+    # long option
+    $ pure-ftpd --userbandwidth <bandwidth or [up]:[down]>
+
+    # pure-ftpd.conf
+    UserBandwidth        <bandwidth or [up]:[down]>
+
+## ログ
+
+### syslogにプロセスIDを出力
+
+プロセスIDをSyslogへの出力に加える。-f &lt;none&gt;が指定された場合にはこのオプションは無視される
+
+    # short option
+    $ pure-ftpd -1
+
+    # long option
+    $ pure-ftpd --logpid
+
+    # pure-ftpd.conf
+    LogPID
+
+### デバッグ用ログ出力
+
+FTPクライアント側の全コマンドをSyslogに出力する。-d -dのように二重に指定するとサーバ側の応答も出力する
+
+    # short option
+    $ pure-ftpd -d
+
+    # long option
+    $ pure-ftpd --verboselog
+
+    # pure-ftpd.conf
+    VerboseLog
+
+### Syslogのfacility設定
+
+Syslogへ出力する際のfacilityを指定する。デフォルトではftp( or local2 )。noneを指定するとSyslogへの出力を行わない
+
+    # short option
+    $ pure-ftpd -f <facility>
+
+    # long option
+    $ pure-ftpd --syslogfacility <facility>
+
+    # pure-ftpd.conf
+    SyslogFacility        <facility>
+
+### DNS名前解決の省略
+
+FTPクライアントの名前解決を行わずにIPアドレスを出力する
+
+    # short option
+    $ pure-ftpd -H
+
+    # long option
+    $ pure-ftpd --dontresolve
+
+    # pure-ftpd.conf
+    DontResolve
+
+### 転送ログ
+
+転送ログを指定したファイル・フォーマットで出力する
+
+    # short option
+    $ pure-ftpd -O <format:file>
+
+    # long option
+    $ pure-ftpd --altlog <format:file>
+
+    # pure-ftpd.conf
+    AltLog        <format:file>
+
+例
+```
+# Apache風の転送ログを出力する
+$ pure-ftpd -O <var>clf:/var/log/pureftpd.log</var>
+# 独自形式の転送ログを出力する
+$ pure-ftpd -O <var>stats:/var/log/pureftpd.log</var>
+# IIS風の転送ログを出力する
+$ pure-ftpd -O <var>w3c:/var/log/pureftpd.log</var>
+# xferlog形式(wu-ftpd等と同じ)で転送ログを出力する
+$ pure-ftpd -O <var>xferlog:/var/log/pureftpd.log</var>
+```
+
+## AnonymousFTP
+
+### Anonymous専用
+
+Anonymous専用FTPサーバにする。anonymous以外のユーザはログインできない
+
+    # short option
+    $ pure-ftpd -e
+
+    # long option
+    $ pure-ftpd --anonymousonly
+
+    # pure-ftpd.conf
+    AnonymousOnly
+
+### Anonymousのアップロード禁止
+
+パーミッションに関わらずanonymousユーザのアップロードを禁止する
+
+    # short option
+    $ pure-ftpd -i
+
+    # long option
+    $ pure-ftpd --anonymouscantupload
+
+    # pure-ftpd.conf
+    AnonymousCantUpload
+
+### 高負荷時のAnonymousダウンロード禁止
+
+ロードアベレージが<load>を超えるときにanonymousユーザのダウンロードを禁止する。ファイル一覧表示とアップロードは可能
+
+    # short option
+    $ pure-ftpd -m <load>
+
+    # long option
+    $ pure-ftpd --maxload <load>
+
+    # pure-ftpd.conf
+    MaxLoad        <load>
+
+### Anonymousのディレクトリ作成許可
+
+anonymousユーザのディレクトリ作成を許可する
+
+    # short option
+    $ pure-ftpd -M
+
+    # long option
+    $ pure-ftpd --anonymouscancreatedirs
+
+    # pure-ftpd.conf
+    AnonymousCanCreateDirs
+
+### AntiWarez
+
+anonymousユーザが「ftp」ユーザ所有のファイルのダウンロードを禁止する。つまり、あるanonymousユーザがアップロードしたファイルを別のanonymousユーザがダウンロードすることを防ぐということ。warezサイト化防止のためのオプション
+
+    # short option
+    $ pure-ftpd -s
+
+    # long option
+    $ pure-ftpd --antiwarez
+
+    # pure-ftpd.conf
+    AntiWarez
+
+### 管理用IPアドレス
+
+管理用のIPアドレスを指定。このIPアドレスへアクセスしてきた場合は一般ユーザのみログインでき、他のIPアドレス以外へアクセスしてきた場合はanonymousユーザのみログインできる
+
+    # short option
+    $ pure-ftpd -V <ip>
+
+    # long option
+    $ pure-ftpd --trustedip <ip>
+
+    # pure-ftpd.conf
+    TrustedIP        <ip>
+
+### 管理用IPアドレス
+
+anonymousユーザに対して、ドットで始まる名前のファイルとディレクトリへのreadアクセスを許可する
+
+    # short option
+    $ pure-ftpd -z
+
+    # long option
+    $ pure-ftpd --allowdotfiles
+
+    # pure-ftpd.conf
+    AllowDotFiles
+
+## NAT,パケットフィルタ
+
+### passiveモード禁止
+
+passiveモードを禁止する
+
+    # short option
+    $ pure-ftpd -N
+
+    # long option
+    $ pure-ftpd --natmode
+
+    # pure-ftpd.conf
+    NATmode
+
+### passiveモード用のポート番号
+
+passiveモードで使用するポートの範囲を指定する
+
+    # short option
+    $ pure-ftpd -p <min port:max port>
+
+    # long option
+    $ pure-ftpd --passiveportrange <min port:max port>
+
+    # pure-ftpd.conf
+    PassivePortRange        <min port:max port>
+
+例
+```
+# 使用するポートの範囲を4000〜5000にする
+$ pure-ftpd -O -p 4000:5000
+```
+
+### passiveモード用のポート番号
+
+PASV/EPSV/SPSVコマンド(要するにpassiveモード)への応答に使うIPアドレスを指定する。DDNS利用時はホスト名を指定する
+
+    # short option
+    $ pure-ftpd -P <IP or Host>
+
+    # long option
+    $ pure-ftpd --forcepassiveip <IP or Host>
+
+    # pure-ftpd.conf
+    ForcePassiveIP        <IP or Host>
+
+## Ratio
+
+### anonymousのratio比率
+
+anonymousユーザのratio比率を設定する。-q 1:5なら1MBのファイルを献上する見返りに5MBのファイルを入手できる
+
+    # short option
+    $ pure-ftpd -q <upload:download>
+
+    # long option
+    $ pure-ftpd --anonymousratio <upload:download>
+
+    # pure-ftpd.conf
+    AnonymousRatio        <upload:download>
+
+### anonymousのratio比率
+
+anonymousユーザ、一般ユーザの両方に対してratio比率を設定する。-aオプション使用時には該当のグループに属するユーザはこの制限は適用されない
+
+    # short option
+    $ pure-ftpd -Q <upload:download>
+
+    # long option
+    $ pure-ftpd --userratio <upload:download>
+
+    # pure-ftpd.conf
+    UserRatio        <upload:download>
+
+## FXP
+
+### FXP許可1
+
+一般ユーザのFXPの使用を許可する
+
+    # short option
+    $ pure-ftpd -w
+
+    # long option
+    $ pure-ftpd --allowuserfxp
+
+    # pure-ftpd.conf
+    AllowUserFXP
+
+### FXP許可2
+
+一般ユーザ以外にanonymousユーザにもFXPの使用を許可する
+
+    # short option
+    $ pure-ftpd -W
+
+    # long option
+    $ pure-ftpd --allowanonymousfxp
+
+    # pure-ftpd.conf
+    AllowAnonymousFXP
+
+## 文字コード
+
+### サーバ側ファイル名の文字コード
+
+サーバ側のファイル名の文字コードを指定する。iconvを利用しているので、&lt;charset&gt;の値は、EUC-JP CP932 ISO-2022-JP SJIS UTF-8 UTF-8-MAC等となる
+
+    # short option
+    $ pure-ftpd -8 <charset>
+
+    # long option
+    $ pure-ftpd --fscharset <charset>
+
+    # pure-ftpd.conf
+    FileSystemCharset        <charset>
+
+### サーバ側ファイル名の文字コード
+
+FTPクライアント側のファイル名のデフォルトの文字コードを指定する
+
+    # short option
+    $ pure-ftpd -9 <charset>
+
+    # long option
+    $ pure-ftpd --clientcharset <charset>
+
+    # pure-ftpd.conf
+    ClientCharset        <charset>
+
+## その他
+
+### ランダムメッセージ
+
+ログイン時に&lt;file&gt;からランダムに選ばれたメッセージを表示する
+
+    # short option
+    $ pure-ftpd -F <file>
+
+    # long option
+    $ pure-ftpd --fortunesfile <file>
+
+    # pure-ftpd.conf
+    FortunesFile        <file>
+
+### ファイル消失防止
+
+ファイルの消失防止のためのオプション。ファイルの名前変更と削除を禁止し、ファイルのアップロードとアップロードのresumeは許可される。上書きについてはアップロード時のresumeのために許可されるので、-rオプションと組み合わせて使うとよい
+
+    # short option
+    $ pure-ftpd -K
+
+    # long option
+    $ pure-ftpd --keepallfiles
+
+    # pure-ftpd.conf
+    KeepAllFiles
+
+### アップロード時の処理
+
+pure-uploadscriptを有効にする
+
+    # short option
+    $ pure-ftpd -o
+
+    # long option
+    $ pure-ftpd --uploadscript
+
+    # pure-ftpd.conf
+    CallUploadScript
+
+### 上書き事故防止
+
+ファイルのアップロード時に、すでに同名のファイルが同じディレクトリに存在する場合は上書きせずにxyz.1、xyz.2などとする
+
+    # short option
+    $ pure-ftpd -r
+
+    # long option
+    $ pure-ftpd --autorename
+
+    # pure-ftpd.conf
+    AutoRename
+
+### Bonjour
+
+Bonjour([参考:support.apple.com](https://support.apple.com/ja-jp/bonjour))を有効にし、Bonjour名を&lt;name&gt;に設定する
+
+    # short option
+    $ pure-ftpd -v <name>
+
+    # long option
+    $ pure-ftpd --bonjour <name>
+
+    # pure-ftpd.conf
+    非対応
