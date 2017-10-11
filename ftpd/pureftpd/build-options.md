@@ -83,36 +83,117 @@
 ## FTPS
 
 ### --with-certfile
+
+SSL certificateファイルの位置を指定する。デフォルトは`/etc/ssl/private/pure-ftpd.pem`
+```
+--with-certfile=<file>
+```
+
 ### --with-implicittls
+
+Implicit(暗黙の) TLS(port 990)を有効にする
+
 ### --with-tls
+
+FTPSに対応するためにはこのオプションを指定する
+
 
 ## 認証
 
 ### --with-extauth
+
+拡張認証機能(extauth)による仮想ユーザ機能を有効にする
+
 ### --with-ldap
+
+LDAPによる仮想ユーザ機能を有効にする。OpenLDAPが必要
+```
+--with-ldap(=<directory>)
+```
+
 ### --with-mysql
+
+MySQLデータベースによる仮想ユーザ機能を有効にする。MySQLが必要
+```
+--with-mysql(=<directory>)
+```
+
 ### --with-pam
+
+PAMに対応する
+
 ### --with-pgsql
+
+PostgreSQLデータベースによる仮想ユーザ機能を有効にする。PostgreSQLが必要
+```
+--with-pgsql(=<directory>)
+```
+
 ### --without-shadow
+
+/etc/shadowを使用しない
+
 ### --with-puredb
+
+PureDBによる仮想ユーザ機能を有効にする
+
 
 ## システムに関係するもの
 
 ### --with-brokenrealpath
+
+一部のSolarisのrealpath()実装に対応するためのオプション。それ以外の環境か、altlogやpure-uploadscriptを使用しないなら不要
+
 ### --without-capabilities
+
+Linux環境で、libcapがインストールされている場合でもlibcapを使用しない
+
 ### --with-largefile
+
+32bitアーキテクチャで2GB以上のファイルのダウンロードに対応する
+
 ### --with-probe-random-dev
+
+コンパイル時に/dev/¥*randomの有無を判定するのではなく実行時に判定する。ホストによって/dev/¥*randomが必ずしも存在するわけでないSolarisのようなOS向けにバイナリパッケージを作成するためのオプション
+
 ### --without-sendfile
+
+sendfileシステムコールを使用しない。SMBFS/TmpFS/NTFSでの不具合対応のためのもの
+
 
 ## メッセージ表示
 
 ### --without-banner
+
+初期バナーメッセージを表示しない
+
 ### --with-boring
+
+ビジネスライクで退屈なメッセージ表示にする
+
 ### --with-cookie
+
+ランダムメッセージやユーザログイン時のメッセージのカスタマイズ機能を有効にする
+
 ### --without-humor
+
+除外しても有効にしても実用には大差はない。FTPセッション維持のためのコマンドに対する応答に影響する
+
 ### --with-language
+
+サーバの応答やsyslog出力の言語を変更する
+```
+--with-language=<lang>
+```
+
 ### --with-paranoidmsg
+
+ユーザ不在時の認証失敗のメッセージとパスワードの誤りによる認証失敗のメッセージとを同一にする
+
 ### --with-welcomemsg
+
+(非推奨)wu-ftpdのwelcome.msg機能を有効にする。この機能を有効にしなくてもデフォルトでは.bannerファイルがあればその内容をディレクトリ移動時に表示する
+
 
 ## 
 
