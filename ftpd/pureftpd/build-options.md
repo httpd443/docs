@@ -2,6 +2,16 @@
 
 対応version 1.0.46
 
+## 概要
+
+PureFTPdをソースコードからビルドする際に指定できるオプションの中で、PureFTPdの機能に関するものを取り上げています。`--prefix`のような一般的なものは省略しています。詳細は下記のようにして確かめるとよいでしょう
+```
+$ tar zxvf pure-ftpd-1.0.46.tar.gz
+$ cd pure-ftpd-1.0.46
+$ ./configure --help
+$ less INSTALL
+$ less README
+```
 
 ## INDEX
 
@@ -30,7 +40,7 @@
  [--with-minimal](#--with-minimal) |
  [--with-mysql](#--with-mysql) |
  [--without-nonalnum](#--without-nonalnum) |
- [--with-nonroot](#-with-nonroot) |
+ [--with-nonroot](#--with-nonroot) |
  [--with-pam](#--with-pam) |
  [--with-paranoidmsg](#--with-paranoidmsg) |
  [--with-peruserlimits](#--with-peruserlimits) |
@@ -54,7 +64,7 @@
  [--with-virtualhosts](#--with-virtualhosts) |
  [--with-welcomemsg](#--with-welcomemsg) |
 
-## おおざっぱな設定
+## ざっくり設定
 
 ### --with-everything
 
@@ -144,9 +154,17 @@ PureDBによる仮想ユーザ機能を有効にする
 
 一部のSolarisのrealpath()実装に対応するためのオプション。それ以外の環境か、altlogやpure-uploadscriptを使用しないなら不要
 
+### --with-bonjour
+
+MacOSXでBonjour機能を有効にする
+
 ### --without-capabilities
 
 Linux環境で、libcapがインストールされている場合でもlibcapを使用しない
+
+### --without-cork
+
+TCP_CORKを無効にする。プレステ用Linuxのような一部のLinuxで必要
 
 ### --with-largefile
 
@@ -169,7 +187,7 @@ sendfileシステムコールを使用しない。SMBFS/TmpFS/NTFSでの不具�
 
 ### --with-boring
 
-ビジネスライクで退屈なメッセージ表示にする
+ビジネスライクなメッセージ表示にする。サーバ応答メッセージからバージョン番号を除外したい場合はこのオプションを有効にする
 
 ### --with-cookie
 
@@ -177,7 +195,7 @@ sendfileシステムコールを使用しない。SMBFS/TmpFS/NTFSでの不具�
 
 ### --without-humor
 
-除外しても有効にしても実用には大差はない。FTPセッション維持のためのコマンドに対する応答に影響する
+除外しても有効にしても実用面の問題はない。無害なところでジョークを交えた応答をする
 
 ### --with-language
 
@@ -190,35 +208,109 @@ sendfileシステムコールを使用しない。SMBFS/TmpFS/NTFSでの不具�
 
 ユーザ不在時の認証失敗のメッセージとパスワードの誤りによる認証失敗のメッセージとを同一にする
 
+### --without-usernames
+
+ファイル一覧表示の際にユーザ名/グループ名を使わずにUIDとGIDを数字のままで表示する
+
 ### --with-welcomemsg
 
 (非推奨)wu-ftpdのwelcome.msg機能を有効にする。この機能を有効にしなくてもデフォルトでは.bannerファイルがあればその内容をディレクトリ移動時に表示する
 
 
-## 
+## ログ
 
 ### --with-altlog
-### --without-ascii
-### --with-bonjour
-### --without-cork
-### --with-diraliases
-### --with-ftpwho
-### --without-globbing
-### --without-inetd
+
+標準でSyslogへ出力されるログとは別に、転送ログ出力機能を有効にする。ログフォーマットはCLF(Apache互換),Stats(独自形式),W3C(IIS互換),xferlog(wu-ftpd互換)。
+
 ### --without-iplogging
-### --without-nonalnum
+
+FTPクライアントのIPアドレスをログに残さない
+
+
+## FTPサーバー機能
+
+### --without-ascii
+
+ASCIIモードに対応しない
+
+### --with-diraliases
+
+ディレクトリエイリアス(ショートカット)機能を有効にする。詳細はREADMEファイルの「DIRECTORY ALIASES」を参照のこと
+
+### --without-globbing
+
+グロビング(ワイルドカード表現によるファイル指定)機能を除外する
+
+
+## 管理用
+
+### --with-ftpwho
+
+pure-ftpwhoコマンドによるftpwho機能を有効にする。この機能はメモリを余分に消費する
+
+### --without-inetd
+
+inetdからの起動に対応しない。スタンドアロンのみでの運用の場合に使う
+
 ### --with-nonroot
-### --with-peruserlimits
+
+一般ユーザアカウントで動作するroot権限不要のFTPサーバを作る。unix認証などroot権限を必要とするような機能は使えなくなる
+
 ### --with-privsep
-### --with-quotas
-### --with-ratios
-### --with-rfc2640
+
+OpenSSHのようなprivilege separation機能を有効にする。詳細はREADMEの「PRIVILEGE SEPARATION」を参照のこと
+
 ### --without-standalone
-### --with-sysquotas
-### --with-throttling
-### --without-unicode
+
+スタンドアロンモードでの起動に対応しない
+
 ### --with-uploadscript
-### --without-usernames
+
+ファイルがアップロードされた時に外部スクリプトを呼び出すpure-uploadscript機能を有効にする
+
 ### --with-virtualchroot
+
+chroot()を使わない仮想chroot機能を有効にする。このオプションを指定しなければ一般的なchroot機能が標準で有効になる。chroot領域外へのシンボリックリンクを作りたい人のための機能
+
 ### --with-virtualhosts
+
+IPアドレスごとに異なるanonymousFTPサーバを実現する。詳細はREADMEの「VIRTUAL SERVERS」を参照のこと
+
+
+## リソース制限
+### --with-peruserlimits
+
+同一ユーザの同時アクセス数制限機能を有効にする
+
+### --with-quotas
+
+仮想quotas機能を有効にする
+
+### --with-ratios
+
+ratio機能を有効にする。ファイル交換サーバ用
+
+### --with-sysquotas
+
+システムのquotas機能に対応する
+
+### --with-throttling
+
+帯域制限機能を有効にする
+
+
+## 多言語対応
+
+### --without-nonalnum
+
+ファイル名が半角英数字+「.-_」で構成されたファイルのみ扱う
+
+### --with-rfc2640
+
+ファイル名の文字コード変換を有効にする。iconvライブラリが必要
+
+### --without-unicode
+
+non-latinな文字を許可しない
 
